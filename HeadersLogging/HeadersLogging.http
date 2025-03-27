@@ -1,0 +1,6 @@
+@HeadersLogging_HostAddress = http://localhost:5118
+
+GET {{HeadersLogging_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
