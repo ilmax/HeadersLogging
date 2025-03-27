@@ -1,12 +1,11 @@
-using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.HttpLogging;
 
 var builder = WebApplication.CreateBuilder(args);
-var port = builder.Configuration.GetValue<int>("PORT", 8080);
-builder.WebHost.ConfigureKestrel((context, serverOptions) =>
+var port = builder.Configuration.GetValue("PORT", 8080);
+builder.WebHost.ConfigureKestrel((_, serverOptions) =>
 {
-    serverOptions.Listen(IPAddress.Loopback, port);
+    serverOptions.ListenAnyIP(port);
 });
 builder.Services.AddHttpLogging(logging =>
 {
