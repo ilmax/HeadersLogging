@@ -1,4 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+ARG TARGETARCH
 USER $APP_UID
 EXPOSE 8080
 WORKDIR /app
