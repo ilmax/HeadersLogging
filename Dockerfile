@@ -8,7 +8,7 @@ ENV TARGETARCH=$TARGETARCH
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY --link ["HeadersLogging/HeadersLogging.csproj", "HeadersLogging/"]
+COPY ["HeadersLogging/HeadersLogging.csproj", "HeadersLogging/"]
 RUN dotnet restore -a $TARGETARCH "HeadersLogging/HeadersLogging.csproj"
 COPY . .
 WORKDIR "/src/HeadersLogging"
