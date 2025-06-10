@@ -1,22 +1,20 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
-WORKDIR /app
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG TARGETARCH
+WORKDIR /source
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["HeadersLogging/HeadersLogging.csproj", "HeadersLogging/"]
-RUN dotnet restore "HeadersLogging/HeadersLogging.csproj"
-COPY . .
-WORKDIR "/src/HeadersLogging"
-RUN dotnet build "HeadersLogging.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy project file and restore as distinct layers
+COPY --link HeadersLogging/*.csproj .
+RUN dotnet restore -a $TARGETARCH
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "HeadersLogging.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Copy source code and publish app
+COPY --link HeadersLogging/. .
+RUN dotnet publish -a $TARGETARCH --no-restore -o /app
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 EXPOSE 8080
+WORKDIR /app
+COPY --link --from=build /app .
+USER $APP_UID
 ENTRYPOINT ["dotnet", "HeadersLogging.dll"]
